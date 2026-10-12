@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Adaptive Median Filter — Digital Image Processing Project
 
 A lightweight image-restoration website built with HTML, CSS, vanilla JavaScript, Python, Flask, NumPy, Pillow, and SciPy. It lets you upload an image, create salt-and-pepper noise, apply a standard median filter or a two-stage adaptive median filter, compare generated results, inspect real image-quality metrics, and download a restored image.
@@ -86,3 +87,6 @@ python -m unittest discover -s tests -v
 ```
 
 The tests cover upload, noise generation, both filters, metrics, result-image serving, downloads, and invalid settings.
+=======
+# Adaptive-median-filetring-
+>>>>>>> a8f42424212c7724a00ce9a4d7fb9f722ed8d2b7
