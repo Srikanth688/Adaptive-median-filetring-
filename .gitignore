@@ -1,0 +1,13 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+uploads/original/*.png
+uploads/noisy/*.png
+static/results/*.png
+!uploads/original/.gitkeep
+!uploads/noisy/.gitkeep
+!static/results/.gitkeep
+.DS_Store
+.sf/

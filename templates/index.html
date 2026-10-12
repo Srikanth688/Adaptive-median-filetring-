@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f9ff">
+  <title>Adaptive Median Filter | DIP Lab</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav-inner">
+      <a class="brand" href="/" aria-label="Adaptive Median Filter home"><span class="brand-icon">DIP</span><span><strong>Adaptive Median Filter</strong><small>Digital Image Processing Lab</small></span></a>
+      <span class="nav-chip"><span class="status-dot"></span> Image restoration workspace</span>
+    </div>
+  </header>
+
+  <main class="container page">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="eyebrow-line"></span> DIP MINI PROJECT</span>
+        <h1>Clean up the noise.<br><span>Keep the details.</span></h1>
+        <p>Explore how median filtering restores images corrupted by salt-and-pepper noise. Upload a photo, create noise, test both filters, and compare real quality metrics.</p>
+        <div class="hero-points"><span><span class="check">✓</span> Original stays unchanged</span><span><span class="check">✓</span> Real processing results</span></div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="art-glow"></div><div class="art-frame art-back"><div class="pixel-grid"></div></div>
+        <div class="art-frame art-front"><div class="photo-shape"><span></span><i></i><b></b></div><div class="art-caption"><span class="caption-dot"></span> RESTORATION PREVIEW</div></div>
+        <div class="floating-tag tag-top">3×3 <small>median window</small></div><div class="floating-tag tag-bottom"><span>✦</span> Adaptive processing</div>
+      </div>
+    </section>
+
+    <section class="workflow-strip" aria-label="Workflow steps">
+      <div class="workflow-step active" data-step="1"><span class="step-number">01</span><span><strong>Upload</strong><small>Choose an image</small></span></div><span class="step-arrow">→</span>
+      <div class="workflow-step" data-step="2"><span class="step-number">02</span><span><strong>Add noise</strong><small>Simulate corruption</small></span></div><span class="step-arrow">→</span>
+      <div class="workflow-step" data-step="3"><span class="step-number">03</span><span><strong>Restore</strong><small>Apply a filter</small></span></div><span class="step-arrow">→</span>
+      <div class="workflow-step" data-step="4"><span class="step-number">04</span><span><strong>Compare & save</strong><small>Review the output</small></span></div>
+    </section>
+
+    <div id="message" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section class="workspace-card" id="upload-section">
+      <div class="section-title"><div class="section-icon">↑</div><div><span class="section-kicker">STEP 01</span><h2>Upload your image</h2><p>Start with a clean image. PNG and JPG files up to 10 MB are supported.</p></div></div>
+      <div class="upload-layout">
+        <label class="drop-zone" id="drop-zone" for="image-input"><input type="file" id="image-input" accept=".png,.jpg,.jpeg,image/png,image/jpeg"><span class="upload-symbol">↑</span><strong>Drop an image here or <span>browse files</span></strong><small>PNG, JPG or JPEG · Maximum 10 MB</small></label>
+        <div class="upload-summary" id="upload-summary"><div class="summary-empty-icon">▧</div><strong>No image selected yet</strong><p>Your image details and preview will appear here after upload.</p></div>
+      </div>
+      <div class="action-row"><button class="button button-primary" id="upload-button" disabled><span>Upload image</span><span class="button-arrow">→</span></button><span class="helper-text">Images are resized to a maximum 800 px longest side for faster processing.</span></div>
+      <div class="loading-line" id="upload-loading" hidden><span class="spinner"></span> Uploading and validating image…</div>
+    </section>
+
+    <section class="workspace-card locked" id="noise-section" aria-labelledby="noise-heading">
+      <div class="section-title"><div class="section-icon">✳</div><div><span class="section-kicker">STEP 02</span><h2 id="noise-heading">Add salt-and-pepper noise</h2><p>Generate a noisy copy from your original image. The original file is never modified.</p></div><span class="lock-label" id="noise-lock">Upload an image first</span></div>
+      <div class="settings-row">
+        <div class="setting-main"><div class="setting-label"><label for="noise-density">Noise density</label><span class="value-pill" id="density-value">5%</span></div><input id="noise-density" type="range" min="0" max="0.5" step="0.01" value="0.05"><div class="range-labels"><span>0% · No noise</span><span>50% · Heavy noise</span></div><p class="field-help">Approximate fraction of pixel locations replaced with black or white, split evenly.</p></div>
+        <div class="noise-preview"><div class="noise-preview-icon"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div><div><strong>Salt & pepper</strong><small>Black + white impulse noise</small></div></div>
+      </div>
+      <div class="action-row"><button class="button button-primary" id="noise-button" disabled>Add Salt &amp; Pepper Noise <span class="button-arrow">→</span></button><span class="helper-text">Each click creates a fresh noisy copy from the original.</span></div>
+      <div class="loading-line" id="noise-loading" hidden><span class="spinner"></span> Generating noise…</div>
+    </section>
+
+    <section class="workspace-card locked" id="restore-section" aria-labelledby="restore-heading">
+      <div class="section-title"><div class="section-icon">⌁</div><div><span class="section-kicker">STEP 03</span><h2 id="restore-heading">Remove noise</h2><p>Choose a filter and odd window size, then restore the noisy image.</p></div><span class="lock-label" id="restore-lock">Generate noise first</span></div>
+      <div class="filter-options" role="group" aria-label="Choose filter">
+        <label class="filter-option selected" id="standard-option"><input type="radio" name="filter" value="standard"><span class="radio-mark"></span><span class="filter-icon">▦</span><span class="filter-copy"><strong>Standard Median</strong><small>Replaces each pixel with its local neighborhood median.</small></span></label>
+        <label class="filter-option" id="adaptive-option"><input type="radio" name="filter" value="adaptive" checked><span class="radio-mark"></span><span class="filter-icon adaptive-icon">✳</span><span class="filter-copy"><strong>Adaptive Median</strong><small>Grows the window when needed to better handle impulse noise.</small><em>Project focus</em></span></label>
+      </div>
+      <div class="settings-row filter-settings">
+        <div class="setting-main"><label for="window-size" id="window-label">Maximum adaptive window</label><select id="window-size"><option value="3">3 × 3</option><option value="5">5 × 5</option><option value="7" selected>7 × 7</option><option value="9">9 × 9</option></select><p class="field-help" id="window-help">Adaptive filtering starts at 3 × 3 and grows up to this maximum.</p></div>
+        <div class="filter-note"><span class="info-icon">i</span><p><strong>Tip</strong> Larger windows can remove more noise, but may smooth fine image details.</p></div>
+      </div>
+      <div class="action-row"><button class="button button-primary" id="restore-button" disabled>Remove Noise <span class="button-arrow">→</span></button><span class="helper-text">Run each filter to populate its comparison panel.</span></div>
+      <div class="loading-line" id="restore-loading" hidden><span class="spinner"></span> Applying filter and calculating metrics…</div>
+    </section>
+
+    <section class="workspace-card comparison-card" id="comparison-section">
+      <div class="section-title"><div class="section-icon">▤</div><div><span class="section-kicker">STEP 04</span><h2>Compare your results</h2><p>Only images that have actually been generated will appear here.</p></div><span class="result-count" id="result-count">0 / 4 images</span></div>
+      <div class="image-grid" id="image-grid">
+        <article class="image-panel" id="panel-original"><div class="panel-top"><span class="panel-index">01</span><div><h3>Original image</h3><small>Clean reference</small></div><span class="panel-state available" id="state-original">Waiting</span></div><div class="image-stage empty" id="stage-original"><span class="stage-icon">▧</span><span>Upload an image to begin</span></div><div class="panel-meta" id="meta-original">No image uploaded</div></article>
+        <article class="image-panel" id="panel-noisy"><div class="panel-top"><span class="panel-index">02</span><div><h3>Noisy image</h3><small>Salt-and-pepper corruption</small></div><span class="panel-state" id="state-noisy">Waiting</span></div><div class="image-stage empty" id="stage-noisy"><span class="stage-icon">✳</span><span>Generate noise to view</span></div><div class="panel-meta" id="meta-noisy">Not generated</div></article>
+        <article class="image-panel" id="panel-standard"><div class="panel-top"><span class="panel-index">03</span><div><h3>Standard median</h3><small>Fixed-size window</small></div><span class="panel-state" id="state-standard">Waiting</span></div><div class="image-stage empty" id="stage-standard"><span class="stage-icon">▦</span><span>Run the standard filter</span></div><div class="panel-meta" id="meta-standard">Not generated</div></article>
+        <article class="image-panel featured-panel" id="panel-adaptive"><div class="panel-top"><span class="panel-index">04</span><div><h3>Adaptive median</h3><small>Variable-size window</small></div><span class="panel-state" id="state-adaptive">Waiting</span></div><div class="image-stage empty" id="stage-adaptive"><span class="stage-icon">✧</span><span>Run the adaptive filter</span></div><div class="panel-meta" id="meta-adaptive">Not generated</div></article>
+      </div>
+      <div class="comparison-footer"><span><span class="legend-dot"></span> Images are processed at matching dimensions for fair comparison.</span><button class="button button-outline" id="download-button" disabled>↓ Download restored image</button></div>
+    </section>
+
+    <section class="workspace-card" id="metrics-section">
+      <div class="section-title"><div class="section-icon">⌗</div><div><span class="section-kicker">QUALITY CHECK</span><h2>Image quality metrics</h2><p>Every metric is calculated against your uploaded clean image.</p></div></div>
+      <div class="table-wrap"><table><thead><tr><th>Image</th><th>MSE <span class="th-hint">↓ lower is better</span></th><th>PSNR (dB) <span class="th-hint">↑ higher is better</span></th><th>SSIM <span class="th-hint">↑ closer to 1</span></th></tr></thead><tbody id="metrics-body"><tr class="empty-row"><td colspan="4">Upload an image and process it to calculate real quality metrics.</td></tr></tbody></table></div>
+      <div class="metric-explain"><div><strong>MSE</strong><p>Mean Squared Error measures average pixel-level difference from the original.</p></div><div><strong>PSNR</strong><p>Peak Signal-to-Noise Ratio expresses reconstruction error in decibels.</p></div><div><strong>SSIM</strong><p>Structural Similarity estimates perceptual structure similarity. May be unavailable if its dependency cannot load.</p></div></div>
+      <p class="metrics-footnote" id="metrics-note">Metrics appear after the corresponding image is processed. Values are never hardcoded.</p>
+    </section>
+
+    <section class="learn-card"><div class="learn-symbol">?</div><div><h2>What happens behind the scenes?</h2><p><strong>Salt-and-pepper noise</strong> randomly turns some pixels black or white. A standard median filter uses one fixed neighborhood size. The <strong>adaptive median filter</strong> checks local minimum, maximum, and median values, then grows its window until it finds a suitable median or reaches the configured maximum.</p></div></section>
+    <footer><span class="footer-brand">DIP LAB</span><span>Adaptive Median Filtering for Salt-and-Pepper Noise Removal</span><span>HTML · CSS · JavaScript · Python / Flask</span></footer>
+  </main>
+</body>
+</html>
