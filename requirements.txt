@@ -3,3 +3,4 @@ numpy>=1.26,<3.0
 Pillow>=10.0
 scipy>=1.11
 scikit-image>=0.22
+gunicorn>=22.0,<24.0
